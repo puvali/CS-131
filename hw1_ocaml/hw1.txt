@@ -1,0 +1,41 @@
+CS 131 HW1 AFTER-ACTION REPORT
+
+(I did not have any issues solving problems 1-6.)
+
+To solve problem 7, I wrote several auxiliary functions:
+
+(a) nt_rhs rhs: takes the rhs of a rule as argument and returns all the
+    nonterminal symbols in it.
+
+(b) nt_rules rl: takes a rule list and uses nt_rhs to return a list of all
+    the nonterminal symbols in the RHS's of all the rules.
+
+(c) nt_start g: takes a grammar and returns a list consisting of the
+    start symbol + all the nonterminals in the grammar which are directly
+    reachable from start.
+
+(d) nt_indirects nt_list rl: takes a list of nonterminals and a rule list and
+    returns all nonterminal symbols in the rule list that are indirectly
+    reachable from these nonterminals.
+
+(e) set_diff a b: takes 2 sets and returns the set function A-B
+   
+(f) nt_all s reachables rl: traverses the given rule list rl while compiling
+    a list of nonterminals in it until there are no more nonterminals. s acts
+    as a "visited" set to keep track of which symbols have been checked, and
+    reachables is the compiled list of reachable nonterminals.
+   
+(g) reachable_grammar g reachables: filters out the rules in grammar g that
+    do not have a reachable nonterminal symbol in the LHS, the returns a list
+    of reachable rules.
+
+filter_reachable uses nt_all and reachable_grammar to build a list of reachable
+nonterminals and filter out unreachable rules.
+
+I considered many different approaches while trying to understand the logic
+of how unreachable rules can be filtered out of a grammar, including checking
+whether every symbol on the LHS of a rule exists on the RHS of some other rule. 
+Then I realized that this was too vague and that rules can be reached
+directly from start or from other nonterminals, so I decided to write a
+function that would go through the entire grammar compiling a list of all
+reachable nonterminals until there are none left. 
