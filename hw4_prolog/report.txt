@@ -1,0 +1,249 @@
+***************************
+*** HW 4: KenKen Solver ***
+***************************
+
+
+To measure performance for kenken/3 and plain_kenken/3,  I used statistics/2 and
+a 4x4 testcase. The 4x4 testcase I chose has a unique solution and all +, *, -
+and / cage constraints:
+
+testcase_3(
+	4,
+        [
+	 /(2, [1|1], [1|2]),
+	 *(96, [[1|3], [1|4], [2|4], [3|4]]),
+	 -(2, [2|1], [2|2]),
+	 +(7, [[2|3], [3|3], [4|3], [4|4]]),
+	 -(2, [3|1], [4|1]),
+	 -(1, [3|2], [4|2])
+        ]).
+
+
+*  *  *	 *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+
+Performance of kenken/3
+
+?- statistics,
+   fd_set_vector_max(255), testcase_3(N,C), kenken(N,C,T),
+   statistics.
+
+Memory               limit         in use            free
+
+   trail  stack      16383 Kb            3 Kb        16380 Kb
+   cstr   stack      16383 Kb            9 Kb        16374 Kb
+   global stack      32767 Kb            4 Kb        32763 Kb
+   local  stack      16383 Kb            3 Kb        16380 Kb
+   atom   table      32768 atoms      1807 atoms     30961 atoms
+
+Times              since start      since last
+
+   user   time     178.863 sec       0.000 sec
+   system time       0.094 sec       0.000 sec
+   cpu    time     178.957 sec       0.000 sec
+   real   time    1442.062 sec       0.000 sec
+
+C = [/(2,[1|1],[1|2]),
+     96*[[1|3],[1|4],[2|4],[3|4]],
+     -(2,[2|1],[2|2]),
+     7+[[2|3],[3|3],[4|3],[4|4]],
+     -(2,[3|1],[4|1]),
+     -(1,[3|2],[4|2])]
+N = 4
+T = [[1,2,4,3],[3,1,2,4],[4,3,1,2],[2,4,3,1]] ? ;
+
+(1 ms) no
+
+The runtime is measured in miliseconds so the kenken/3 predicate took less than
+1 milisecond to generate a solution for a 4x4 testcase and 1 ms to find that
+there are no other solutions.
+
+
+*  *  *	 *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+
+Performance of plain_kenken/3
+
+?- statistics,
+   testcase_3(N,C), plain_kenken(N,C,T),
+   statistics.
+
+Memory               limit         in use            free
+
+   trail  stack      16383 Kb            0 Kb        16383 Kb
+   cstr   stack      16384 Kb            0 Kb        16384 Kb
+   global stack      32767 Kb            9 Kb        32758 Kb
+   local  stack      16383 Kb            6 Kb        16377 Kb
+   atom   table      32768 atoms      1807 atoms     30961 atoms
+
+Times              since start      since last
+
+   user   time     175.131 sec       0.249 sec
+   system time       0.078 sec       0.000 sec
+   cpu    time     175.209 sec       0.249 sec
+   real   time    1208.539 sec       0.250 sec
+   
+C = [/(2,[1|1],[1|2]),
+     96*[[1|3],[1|4],[2|4],[3|4]],
+     -(2,[2|1],[2|2]),
+     7+[[2|3],[3|3],[4|3],[4|4]],
+     -(2,[3|1],[4|1]),
+     -(1,[3|2],[4|2])]
+N = 4
+T = [[1,2,4,3],
+     [3,1,2,4],
+     [4,3,1,2],
+     [2,4,3,1]] ? ;
+     
+(3980 ms) no
+
+plain_kenken/3 took 250 miliseconds to generate a solution and 3980 miliseconds
+to find that there are no other solutions.
+
+
+*  *  *	 *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+
+I also measured kenken/3's performance on a 6x6 testcase (the one given in the
+spec) as follows:
+
+?- statistics,
+   fd_set_vector_max(255), testcase_1(N,C), kenken(N,C,T),
+   statistics.
+
+Memory               limit         in use            free
+
+   trail  stack      16383 Kb            8 Kb        16375 Kb
+   cstr   stack      16383 Kb           27 Kb        16356 Kb
+   global stack      32767 Kb            7 Kb        32760 Kb
+   local  stack      16383 Kb            7 Kb        16376 Kb
+   atom   table      32768 atoms      1807 atoms     30961 atoms
+
+Times              since start      since last
+
+   user   time       3.899 sec       0.000 sec
+   system time       0.006 sec       0.000 sec
+   cpu    time       3.905 sec       0.000 sec
+   real   time     779.037 sec       0.001 sec
+
+C = [11+[[1|1],[2|1]],
+     /(2,[1|2],[1|3]),
+     20*[[1|4],[2|4]],
+     6*[[1|5],[1|6],[2|6],[3|6]],
+     -(3,[2|2],[2|3]),
+     /(3,[2|5],[3|5]),
+     240*[[3|1],[3|2],[4|1],[4|2]],
+     6*[[3|3],[3|4]],
+     6*[[4|3],[5|3]],
+     7+[[4|4],[5|4],[5|5]],
+     30*[[4|5],[4|6]],
+     6*[[5|1],[5|2]],
+     9+[[5|6],[6|6]],
+     8+[[6|1],[6|2],[6|3]],
+     /(2,[6|4],[6|5])]
+N = 6
+T = [[5,6,3,4,1,2],
+     [6,1,4,5,2,3],
+     [4,5,2,3,6,1],
+     [3,4,1,2,5,6],
+     [2,3,6,1,4,5],
+     [1,2,5,6,3,4]] ? ;
+
+no
+
+Evidently, kenken/3 took 1 milisecond on the 6x6 testcase.
+
+
+*  *  *	 *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+
+No-op KenKen
+
+Since the puzzle solver must determine the corresponding operations for the
+given constraint blocks, a Prolog no-op KenKen solver predicate noop_kenken/4
+would need to take:
+
+* N:  a nonnegative integer specifying the number of cells on
+      each side of the KenKen square.
+     
+* C:  a list of list of numeric cage constraints. Here, since the operations are
+      not known, a constraint might have a list of operands (as with + and *) or
+      2 operands (as with - and /) so every cage constraint should be of the form
+      (R, L) where R is the resulting integer and L is a list of operands
+      (squares). After a successful call, C is outputted as is. 
+     
+* OC: a list of list of possible operations. Each list in OC contains a list of
+      the operation(s) that can be performed to fulfill the constraint in its
+      corresponding position in C. There may also be constraint blocks with only
+      a single integer so for those the operation list would just be []. A
+      successful call fills in OC with op lists and outputs it. 
+     
+* T:  a list of list of integers representing the NxN grid, to be filled in and
+      outputted by the solver (in a successful call).
+
+For unsuccessful calls, the output is always just "no" as it was for my
+implementations of kenken/3 and plain_kenken/3.
+
+noop_kenken_testcase(
+	4,
+	[
+	 (3, [[1|1], [2|1]]),
+	 (2, [[1|2], [1|3]]),
+	 (1, [[1|4], [2|4]]),
+	 (12, [[2|2], [3|2], [4|2]]),
+	 (5, [[2|3], [3|3]]),
+	 (6, [[3|1], [4|1]]),
+	 (3, [[3|4]]),
+	 (5, [[4|3], [4|4]])
+	], OC, T).
+
+Calling the solver on this testcase should output:
+
+N = 4
+
+C = [3, [[1|1], [2|1]]],
+    [2, [[1|2], [1|3]]],
+    [1, [[1|4], [2|4]]],
+    [12, [[2|2], [3|2], [4|2]]],
+    [5, [[2|3], [3|3]]],
+    [6, [[3|1], [4|1]]],
+    [3, [[3|4]]],
+    [5, [[4|3], [4|4]]]
+    
+OC = [[*,/],
+      [-,/],
+      [-],
+      [*],
+      [+],
+      [+],
+      [],
+      [+]]
+
+T = [[3,2,4,1],
+     [1,4,3,2],
+     [4,1,2,3],
+     [2,3,1,4]]
+
+I got this sample no-op KenKen puzzle and its solution from:
+https://krazydad.com/inkies/sfiles/INKY_4NOP_b001_4pp.pdf
+
+In my implementations of kenken/3, there are predicates check_constraint and
+plain_check_constraint that perform the cage constraint checks. check_constraint
+calls sum/3, product/3, difference/3 or quotient/3 depending on the operation in
+the constraint it takes as argument. In noop_kenken, a constraint check
+predicate would not get any operation; rather it would get the result and a list
+of integers. So a simple implementation would simply test all available
+operations on the integers to see which ops yield the desired result. This would
+not be very efficient, however, so noop_kenken could try to limit the number of
+checks it has to perform by trying to solve a puzzle in a similar way to how a
+human would do it.
+
+For example:
+https://webpages.uncc.edu/~hbreiter/JRMF/NoOpKenKen.pdf
+In page 2 of the above link, a strategy applied to narrow down the list of
+possible operations is noticing that for a constraint block of 3 integers and
+result 12, the only possible operation is multiplication. For both the 4-integer
+constraint block with result 12 and the 6-integer constraint-block with result
+12, the only possible operation is addition. Using this knowledge, the solver
+would be able to eliminate a lot of unnecessary constraint checks and improve
+performance.  
