@@ -1,0 +1,55 @@
+*** After-Action Report ***
+
+I wrote my make_parser in terms of my make_matcher and this is because the first
+thing make_parser has to do before actually constructing a parse tree is
+checking whether the given fragment can be parsed from beginning to end. For
+this, there needs to be a viable match for that fragment in the given grammar
+and additionally, the acceptor must return an empty list since the entire
+fragment needs to be matched the rules. Since the logic of make_matcher contains
+the functionality for trying the grammar rules against a fragment and returning
+the result of the acceptor function, I used the same logic in make_parser with a
+few tweaks and the added functionality of constructing a parse tree out of the
+path to the leaves that make up the fragment that is found by the
+parser. However, I did not use any duplicate functions because while make_parser
+is attempting to keep track of the path, including the visited non-terminals,
+make_parser does not do so since if it is able to match any prefix of the
+fragment to whichever rule it finds first, it just sends the suffix to the
+acceptor. Therefore, I avoided duplication in the two functions by using
+auxiliary functions for make_parser that keep track of the visited
+nonterminal-rule pairs that are part of the final path to be
+returned. Furthermore, my make_parser function accepts a suffix from its
+acceptor function but for make_parser, in the auxiliary function that creates a
+list of nonterminal-rule pairs in the path, there is a nested "acceptor"
+function which returns this path list instead of a suffix. The actual
+make_parser uses this returned path to construct the parse tree after reversing
+it. This is because the path is backwards since the node/leaf tuples are added
+to the front of the path list during construction.
+
+Some of the weaknesses in my solution in the context of its intended function
+are:
+
+1. make_matcher always returns the first acceptable match which may not be the
+   longest possible match covering all the symbols in the fragment.
+   For example, for the awkish_grammar in the sample test cases, if make_matcher
+   is given the fragment ["3";"+";"$";"1";"++"], it returns the suffix ["++"]
+   instead of [] even though it is possible to derive the entire fragment with
+   the grammar. This is because the rule Term -> N Lvalue comes before the rule
+   Term -> N Lvalue | N Incrop so the 2nd rule is never considered.
+   For the given assignment, the aim is to write a matcher+parser that looks at
+   a string of terminals and decides whether it is acceptable. When the
+   accepting criteria is not strict and the intention is only to see if a given
+   fragment contains an acceptable prefix, then my solution works fine. But
+   realistically, it would make more sense to ensure that the entire fragment is
+   acceptable, and make_matcher does not do without help from a good acceptor.
+   
+2. make_matcher and make_parser cannot handle any mutually recursive rules
+   i.e. nonterminal pairs that include each other in their respective alternative
+   lists. The matcher/parser just goes into an infinite loop. Because of this,
+   once the matcher is stuck in the loop, it cannot look at later rules in a
+   nonterminal's alternative list that would not lead to an infinite loop. This
+   is because both the matcher and parser look at rules from left to right, so
+   they cannot handle left recursion in the grammar.
+   
+3. My solution also does not do anything to avoid infinite loops, so the OCaml
+   system just prints a message saying "Stack overflow during evaluation
+   (looping recursion?)."
